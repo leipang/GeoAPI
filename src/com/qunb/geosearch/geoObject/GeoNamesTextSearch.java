@@ -95,7 +95,7 @@ public class GeoNamesTextSearch {
 	public GeoName JsonToGeoName(JSONObject json){
 			GeoName geo = new GeoName();
 			geo.setGeonameId(Long.parseLong(json.get("geonameId").toString()));
-			geo.setToponymName(json.get("toponymName").toString());
+			geo.setName(json.get("name").toString().toLowerCase());
 			//geo.setAlternateNames((JSONObject)json.get("alternateNames"));
 			geo.setCountryName(json.get("countryName").toString());
 			geo.setCountryCode(json.get("countryCode").toString());
@@ -137,7 +137,17 @@ public class GeoNamesTextSearch {
 		System.out.println("Geonames API find "+this.getData().size()+" results!");
 		List<Entity> datalist= this.getData();
 		for(int i =0;i<datalist.size();i++){
-			Entity geo = datalist.get(i);
+			Entity geo = new Entity("GeoName",datalist.get(i).getProperty("geonameId").toString());
+			geo.setProperty("geonameId", datalist.get(i).getProperty("geonameId").toString());
+			geo.setProperty("name", datalist.get(i).getProperty("name").toString());
+			geo.setProperty("countryName", datalist.get(i).getProperty("countryName").toString());
+			geo.setProperty("countryCode", datalist.get(i).getProperty("countryCode").toString());
+			geo.setProperty("Lat", datalist.get(i).getProperty("Lat"));
+			geo.setProperty("Lng", datalist.get(i).getProperty("Lng"));
+			geo.setProperty("AlternateNames", datalist.get(i).getProperty("AlternateNames"));
+			geo.setProperty("Fcl", datalist.get(i).getProperty("Fcl").toString());
+			geo.setProperty("Fcode",datalist.get(i).getProperty("Fcode").toString());
+			geo.setProperty("Population",datalist.get(i).getProperty("Population"));
 			this.datastore.put(geo);
 			System.out.println("data added");
 		}

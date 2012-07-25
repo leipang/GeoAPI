@@ -99,12 +99,12 @@ public class GeoName {
 		this.population=population;
 	}
 	public Entity toEntity(){
-		Key geo_key = KeyFactory.createKey("GeonameId", this.getGeonameId());
+		Key geo_key = KeyFactory.createKey("GeonameId", this.getGeonameId().toString());
 		Entity geo = new Entity("GeoName",geo_key);
-		geo.setProperty("GeonameId", this.getGeonameId());
+		geo.setProperty("geonameId", this.getGeonameId());
+		geo.setProperty("name", this.getName());
 		geo.setProperty("countryName", this.getCountryName());
 		geo.setProperty("countryCode", this.getCountryCode());
-		geo.setProperty("ToponymName", this.getToponymName());
 		geo.setProperty("Lat", this.getLat());
 		geo.setProperty("Lng", this.getLng());
 		geo.setProperty("AlternateNames", this.getAlternateNames());

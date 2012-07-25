@@ -11,6 +11,7 @@ import org.restlet.resource.ServerResource;
 
 import com.google.appengine.api.datastore.Entity;
 import com.qunb.geosearch.geoObject.GeoNamesTextSearch;
+import com.qunb.geosearch.geoObject.QunbTextSearch;
 
 
 import javax.ws.rs.Path;
@@ -27,17 +28,24 @@ public class QunbGeoTextSearchResource extends ServerResource{
 		String country = getQuery().getValues("country");
 		String lang = getQuery().getValues("lang");
 		String limit = getQuery().getValues("limit");
-		GeoNamesTextSearch mysearch2 = new GeoNamesTextSearch(input,type,country,lang);
-		mysearch2.storeData();
-		List<Entity> myresult = mysearch2.getResult();
+		QunbTextSearch mysearch2 = new QunbTextSearch(input,type,country,lang, limit);
+		//mysearch2.storeData();
+		List<Entity> myresult = mysearch2.getData_1parameter();
+		if(myresult.isEmpty()){
+			GeoNamesTextSearch mysearch = new GeoNamesTextSearch(input,type,country,lang);
+			mysearch.storeData();
+			//QunbTextSearch mysearch1 = new QunbTextSearch(input,type,country,lang, limit);
+			myresult = mysearch.getResult();
+		}
+		
 		JSONObject json = toJson(myresult.get(0));
 		return json;
 	}
 	
 	public JSONObject toJson(Entity geo) throws JSONException{
 		JSONObject obj=new JSONObject();
-		obj.put("qunb:geoId", geo.getProperty("GeonameId"));
-		obj.put("qunb:geoName", geo.getProperty("ToponymName"));
+		obj.put("qunb:geoId", geo.getProperty("geonameId"));
+		obj.put("qunb:geoName", geo.getProperty("name"));
 		//obj.put("qunb:AlternateNames", geo.getProperty("AlternateNames"));
 		return obj;
 	}

@@ -24,6 +24,7 @@ import org.json.simple.JSONValue;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 
@@ -60,40 +61,52 @@ public class QunbTextSearch {
 	@SuppressWarnings("deprecation")
 	public  List<Entity> getData_3parameters() throws IOException{
 		List<Entity> output = new ArrayList<Entity>();
-		Query q = new Query();
-		q.addFilter("GeoName", FilterOperator.EQUAL, this.input);
-	
-		
-		
-		
-		
-		
-
-		/*
-		if(output.size()==0){
-			//add fuzzy match
-			System.out.println("----Launch the Fuzzy Match----");
-			for (String item:list_item) {
-				if(item.endsWith(".json")){
-					String name = item;
-					String content = new String(mystore.getService().getItem(name),"utf-8");
-					result = (JSONObject) JSONValue.parse(content);
-					if(LetterSimilarity.isSimilarEnough(result.get("toponymName").toString().toLowerCase(), this.input.toLowerCase(), CouplingLevel.LOW)&&result.get("countryName").toString().toLowerCase().equals(this.country.toLowerCase())){
-						System.out.println("---Match Found at Qunb---");
-						output.add(result);
-					}
-				}
-			}
-		}*/
-		
+//		Query q = new Query("GeoName");
+//		q.addFilter("Name", FilterOperator.EQUAL, this.input);
+//		
+//	
+//		
+//		
+//		
+//		
+//		
+//
+//		/*
+//		if(output.size()==0){
+//			//add fuzzy match
+//			System.out.println("----Launch the Fuzzy Match----");
+//			for (String item:list_item) {
+//				if(item.endsWith(".json")){
+//					String name = item;
+//					String content = new String(mystore.getService().getItem(name),"utf-8");
+//					result = (JSONObject) JSONValue.parse(content);
+//					if(LetterSimilarity.isSimilarEnough(result.get("toponymName").toString().toLowerCase(), this.input.toLowerCase(), CouplingLevel.LOW)&&result.get("countryName").toString().toLowerCase().equals(this.country.toLowerCase())){
+//						System.out.println("---Match Found at Qunb---");
+//						output.add(result);
+//					}
+//				}
+//			}
+//		}*/
+//		
 		return output;
 	}
 	
 	public void serchQuery(){
 		
 	}
-//	public List<JSONObject> getData_1parameter() throws IOException{
-//		List<JSONObject> output = new ArrayList<JSONObject>();
+	@SuppressWarnings("deprecation")
+	public List<Entity> getData_1parameter() throws IOException{
+		List<Entity> output = new ArrayList<Entity>();
+		Query q = new Query("GeoName");
+		q.addFilter("name", FilterOperator.EQUAL, this.input);
+		PreparedQuery pq = datastore.prepare(q);
+		for (Entity result : pq.asIterable()) {
+			String name = (String) result.getProperty("name");
+			String id = String.valueOf(result.getProperty("geonameId")) ;
+			  System.out.println(name + " " + id );
+			  output.add(result);
+			}
+		
 //		JSONObject result = new JSONObject();
 //		QunbS3Store mystore = new QunbS3Store(this.datastore);
 //		System.out.println("There are "+mystore.getService().listItems().size()+" data in qunbstore");
@@ -127,15 +140,16 @@ public class QunbTextSearch {
 //		if(output.size()==0){
 //			System.out.println("---Result Not Found at Qunb---");
 //		}
-//		return output;
-//	}
+		return output;
+	}
 	//problem!!!
 	public List<Entity> constructResult() throws Exception{
 		List<Entity> mydata = new ArrayList<Entity>();
 
 			System.out.println("Search with  parameters");
-			mydata = this.getData_3parameters();
+			mydata = this.getData_1parameter();
 		if(mydata.isEmpty()){
+			System.out.println("no results found");
 			return null;
 		}
 		return mydata;
@@ -146,6 +160,9 @@ public class QunbTextSearch {
 	}
 	public String getType(){
 		return this.type;
+	}
+	public List<Entity> getResult(){
+		return this.result;
 	}
 	
 //	public List<Map<String,Object>> getResult(){
